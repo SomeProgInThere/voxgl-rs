@@ -71,11 +71,11 @@ impl Quad {
             ],
         };
 
-        let range = 0.7;
+        let green_range = 0.5;
         let color = Color::new(
-            (0.7 - range) + rand::thread_rng().gen_range(0.3f32..range),
-            (0.2 - range) + rand::thread_rng().gen_range(0.1f32..range),
-            (0.6 - range) + rand::thread_rng().gen_range(0.6f32..range),
+            rand::thread_rng().gen_range(0f32..0.2f32),
+            (1.0 - green_range) + rand::thread_rng().gen_range(0f32..green_range),
+            rand::thread_rng().gen_range(0f32..0.1f32),
             1.0,
         );
 

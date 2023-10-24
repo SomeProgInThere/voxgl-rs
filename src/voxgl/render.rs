@@ -32,7 +32,7 @@ impl State {
         });
 
         render_pass.set_pipeline(&self.render_pipeline);
-        let _ = self.chunks.draw(&mut render_pass, &self.camera.bind_group, &self.resources);
+        let _ = self.chunks.draw(&mut render_pass, &self.camera.bind_group, &self.arena);
 
         drop(render_pass);
         self.queue.submit(std::iter::once(encoder.finish()));

@@ -1,6 +1,5 @@
 use crate::voxgl::texture;
-use crate::voxgl::world::rendering::utils;
-use crate::voxgl::world::rendering::vertex::Vertex;
+use crate::voxgl::rendering::{utils, vertex::Vertex};
 
 pub fn create_voxel_pipeline(device: &wgpu::Device, layouts: &[&wgpu::BindGroupLayout]) -> wgpu::RenderPipeline {
     let shader_module = utils::create_shader_module(

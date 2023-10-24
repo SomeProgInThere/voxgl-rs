@@ -1,7 +1,7 @@
 use cgmath::{InnerSpace, SquareMatrix};
 use wgpu::util::DeviceExt;
 use crate::voxgl::camera::projection::Projection;
-use crate::voxgl::world::rendering::utils;
+use crate::voxgl::rendering::utils;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]

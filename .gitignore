@@ -1,2 +1,5 @@
-./.idea
-./target
+/target
+.vscode/settings.json
+rust-toolchain.toml
+.cargo/config.toml
+Cargo.lock

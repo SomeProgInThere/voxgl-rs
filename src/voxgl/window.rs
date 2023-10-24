@@ -16,6 +16,7 @@ pub async fn run() {
         .build(&event_loop).unwrap();
 
     let mut state = State::new(window).await;
+
     let mut last_render_time = std::time::Instant::now(); 
 
     event_loop.run(move |event, _, control_flow| 

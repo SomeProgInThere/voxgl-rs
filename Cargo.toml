@@ -19,5 +19,12 @@ log = "0.4.19"
 pollster = "0.3.0"
 rand = "0.8.5"
 wgpu = "0.17.0"
-winit = "0.28.6"
-debug_print = "1.0.0"
+winit = "0.28.7"
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies 
+[profile.dev.package."*"]
+opt-level = 3

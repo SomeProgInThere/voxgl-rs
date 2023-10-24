@@ -5,14 +5,16 @@ use winit::{
     window::{Window, CursorGrabMode}, 
     event::{WindowEvent, KeyboardInput, MouseButton, ElementState, VirtualKeyCode}
 };
-use crate::voxgl::camera::camera::CameraUniform;
-use crate::voxgl::camera::camera_controller::CameraController;
-use crate::voxgl::texture::Texture;
-use crate::voxgl::world::{
-    chunks::Chunks,
-    rendering::{resources::VRAMResources, pipeline},
+
+use crate::voxgl::{ 
+    camera::{
+        camera::{Camera, CameraUniform},
+        camera_controller::CameraController,
+    },
+    texture::Texture, 
+    world::chunks::Chunks,
+    rendering::{arena::MeshArena, pipeline},
 };
-use super::camera::camera::Camera;
 
 pub struct State {
     pub surface: wgpu::Surface,
@@ -23,7 +25,7 @@ pub struct State {
     pub window: Window,
     pub render_pipeline: wgpu::RenderPipeline,
     pub depth_texture: Texture,
-    pub resources: VRAMResources,
+    pub arena: MeshArena,
 
     pub camera_uniform: CameraUniform,
     pub camera: Camera,
@@ -40,7 +42,7 @@ impl State {
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
-                backends: wgpu::Backends::all(),
+                backends: wgpu::Backends::VULKAN,
                 dx12_shader_compiler: Default::default(),
             }
         );
@@ -54,7 +56,7 @@ impl State {
         ).await.unwrap();
 
         let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor {
-                features: wgpu::Features::empty(),
+                features: wgpu::Features::POLYGON_MODE_LINE,
                 limits: wgpu::Limits::default(),
                 label: None
             },
@@ -73,11 +75,12 @@ impl State {
         };
 
         surface.configure(&device, &config);
+
         let depth_texture = Texture::create_depth_texture(&device, &config, "depth_texture");
 
         let mut camera_uniform = CameraUniform::new();
         let camera = Camera::new(
-            cgmath::Point3::new(0.0, 4.0, 5.0),
+            cgmath::Point3::new(0.0, 20.0, 0.0),
             cgmath::Deg(-90.0).into(),
             cgmath::Deg(-20.0).into(),
             config.width as f32 / config.height as f32,
@@ -92,14 +95,17 @@ impl State {
 
         let render_pipeline = pipeline::create_voxel_pipeline(
             &device,
-            &[&camera.layout]
+            &[&camera.layout],
         );
 
-        let mut resources = VRAMResources::new();
+        let mut arena = MeshArena::new();
         let mut chunks = Chunks::new();
 
-        chunks.update_chunk_load_queue();
-        chunks.build_chunk_in_queue(&device, &mut resources);
+        chunks.update_load_data_queue();
+        chunks.update_load_mesh_queue();
+
+        chunks.build_chunk_data_in_queue();
+        chunks.build_chunk_meshes_in_queue(&device, &mut arena);
 
         let sky_color = wgpu::Color {
             r: 0.14, g: 0.67, b: 0.95, a: 1.0
@@ -117,10 +123,10 @@ impl State {
             camera_uniform,
             camera,
             camera_controller,
-
+		
             sky_color,
             chunks,
-            resources,
+            arena,
 
             mouse_pressed: false,
             cursor_grabbed: false,
@@ -157,6 +163,7 @@ impl State {
             } => {
                 if self.window.has_focus() {
                     self.camera_controller.process_keyboard(*key, *state);
+
                     if *key == VirtualKeyCode::Escape && *state == ElementState::Pressed {
                         self.grab_cursor();
                     }
@@ -188,13 +195,19 @@ impl State {
         self.chunks.position = (self.camera.position.x, self.camera.position.y, self.camera.position.z).into();
 
         if rand::thread_rng().gen_range(0..5) == 0 {
-            self.chunks.update_chunk_load_queue();
-            self.chunks.update_chunk_unload_queue();
+            self.chunks.update_load_data_queue();
+            self.chunks.update_load_mesh_queue();
+
+            self.chunks.update_unload_mesh_queue();
+            self.chunks.update_unload_data_queue();
         }
 
-        self.chunks.build_chunk_in_queue(&self.device, &mut self.resources);
-        self.chunks.unload_chunk_queue(&mut self.resources);
-    }    
+        self.chunks.build_chunk_data_in_queue();
+        self.chunks.build_chunk_meshes_in_queue(&self.device, &mut self.arena);
+        
+        self.chunks.unload_data_queue();
+        self.chunks.unload_mesh_queue(&mut self.arena);
+    }
 
     fn grab_cursor(&mut self) {
         self.cursor_grabbed = !self.cursor_grabbed;

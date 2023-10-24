@@ -2,8 +2,9 @@
 pub mod window;
 pub mod state;
 pub mod render;
+pub mod texture;
 
 // modules
 pub mod camera;
 pub mod world;
-mod texture;
+pub mod rendering;
