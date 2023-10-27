@@ -1,6 +1,6 @@
 use cgmath::Vector3;
-use rand::Rng;
-use crate::voxgl::world::color::Color;
+
+use super::color::Color;
 
 #[derive(Debug)]
 pub enum Face {
@@ -71,13 +71,7 @@ impl Quad {
             ],
         };
 
-        let green_range = 0.5;
-        let color = Color::new(
-            rand::thread_rng().gen_range(0f32..0.2f32),
-            (1.0 - green_range) + rand::thread_rng().gen_range(0f32..green_range),
-            rand::thread_rng().gen_range(0f32..0.1f32),
-            1.0,
-        );
+        let color = Color::new(0.12, 0.4, 0.2, 1.0);
 
         Self {
             vertices, face, color,

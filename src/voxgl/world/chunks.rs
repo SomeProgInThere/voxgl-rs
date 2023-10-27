@@ -7,15 +7,15 @@ use crate::voxgl::world::mesh_builder::{self};
 use crate::voxgl::rendering::arena::MeshArena;
 use crate::voxgl::world::voxel::Voxel;
 
-pub const RENDER_DISTANCE: i32 = 4;
+pub const RENDER_DISTANCE: i32 = 8;
 
 pub const MAX_DATA_LOAD: usize = 10_000;
 pub const MAX_MESH_LOAD: usize = 10_000;
 
-pub const MAX_DATA_LOAD_QUEUE: usize = 6;
-pub const MAX_MESH_LOAD_QUEUE: usize = 6;
-pub const MAX_DATA_UNLOAD_QUEUE: usize = 6;
-pub const MAX_MESH_UNLOAD_QUEUE: usize = 6;
+pub const MAX_DATA_LOAD_QUEUE: usize = 12;
+pub const MAX_MESH_LOAD_QUEUE: usize = 8;
+pub const MAX_DATA_UNLOAD_QUEUE: usize = 12;
+pub const MAX_MESH_UNLOAD_QUEUE: usize = 8;
 
 pub struct Chunks {
     chunk_data_map: HashMap<cgmath::Vector3<i32>, ChunkData>,

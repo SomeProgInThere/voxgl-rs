@@ -43,7 +43,7 @@ impl State {
         let size = window.inner_size();
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
                 backends: wgpu::Backends::VULKAN,
-                dx12_shader_compiler: Default::default(),
+                ..Default::default()
             }
         );
         
@@ -90,8 +90,9 @@ impl State {
             &camera_uniform,
             &device
         );
+        
         camera_uniform.update_view_proj(&camera);
-        let camera_controller = CameraController::new(15.0, 2.0);
+        let camera_controller = CameraController::new(18.0, 1.0);
 
         let render_pipeline = pipeline::create_voxel_pipeline(
             &device,
