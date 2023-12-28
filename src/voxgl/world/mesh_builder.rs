@@ -1,11 +1,12 @@
 use cgmath::Vector3;
 use wgpu::util::DeviceExt;
+
 use crate::voxgl::{
-    rendering::{vertex::Vertex, arena::MeshArena},
+    rendering::{arena::MeshArena, vertex::Vertex},
     world::{
         chunk::SIZE,
         chunks::Chunks,
-        quad::{Quad, Face},
+        quad::{Face, Quad},
         voxel::Voxel,
     }
 };
@@ -43,6 +44,8 @@ pub fn build_chunk_mesh(
     if quads.is_empty() {
         //println!("[Mesh] Empty quads!");
     }
+    
+    let mut m = 29.04;
 
     let mut vertices = Vec::<Vertex>::new();
     let mut indices = Vec::<u32>::new();
@@ -99,6 +102,7 @@ fn process_quads(quads: &Vec<Quad>, vertices: &mut Vec<Vertex>, indices: &mut Ve
         (0..4).for_each(|index| {
             vertices.push(Vertex {
                 position: quad.vertices[index].into(),
+                normal: quad.face.get_normal().into(),
                 color: quad.color.into(),
             });
         });

@@ -1,5 +1,5 @@
 /target
-.vscode/settings.json
+/.idea
 rust-toolchain.toml
 .cargo/config.toml
 Cargo.lock

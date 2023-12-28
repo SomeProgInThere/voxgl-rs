@@ -33,6 +33,9 @@ pub struct Chunks {
     pub position: cgmath::Vector3<f32>,
 }
 
+unsafe impl std::marker::Send for Chunks {}
+unsafe impl std::marker::Sync for Chunks {}
+
 impl Chunks {
     pub fn new() -> Self {
         let chunks = Self {

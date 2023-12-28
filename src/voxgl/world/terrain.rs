@@ -20,9 +20,9 @@ impl ChunkData {
 }
 
 fn get_height(noise: &mut FastNoise, x: f32, y: f32) -> f32 {
-    noise.set_noise_type(NoiseType::Perlin);
-    noise.set_fractal_octaves(3);
-    noise.set_frequency(0.01);
+    noise.set_noise_type(NoiseType::Simplex);
+    noise.set_fractal_octaves(5);
+    noise.set_frequency(0.02);
     
     clamped_normalize(noise.get_noise(x, y), 100f32)
 }

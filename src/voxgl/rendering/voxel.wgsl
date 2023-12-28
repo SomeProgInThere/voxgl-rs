@@ -10,29 +10,47 @@ var<uniform> camera: CameraUniform;
 
 struct VertexInput {
     @location(0) position: vec3<f32>,
-    // @location(1) normal: vec3<f32>,
-    @location(1) color: vec4<f32>,
+    @location(1) normal: vec3<f32>,
+    @location(2) color: vec4<f32>,
 }
 
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
     @location(0) color: vec4<f32>,
-    // @location(1) normal: vec3<f32>,
+    @location(1) shading: f32,
 }
 
 @vertex
-fn vs_main(model: VertexInput) -> VertexOutput {
+fn vs_main(vert_in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
-    out.color = model.color;
-    out.clip_position = camera.view_proj * vec4<f32>(model.position, 1.0);
-   // out.normal = model.normal;
+    var face_shade = array<f32, 6>(
+        1.0, 0.5, // top, bottom 
+        0.5, 0.8, // right, left
+        0.5, 0.8, // front, back
+    );
 
+    var ao_values = array<f32, 4>(0.1, 0.25, 0.5, 1.0);
+
+    out.color = vert_in.color;
+    out.clip_position = camera.view_proj * vec4<f32>(vert_in.position, 1.0);
+    var face_id: i32;
+
+    if vert_in.normal.x > 0.0 { face_id = 2; } 
+    else if vert_in.normal.x < 0.0 { face_id = 3; }
+    else if vert_in.normal.y > 0.0 { face_id = 0; }
+    else if vert_in.normal.y < 0.0 { face_id = 1; }
+    else if vert_in.normal.z > 0.0 { face_id = 4; }
+    else if vert_in.normal.z < 0.0 { face_id = 5; }
+
+    out.shading = face_shade[face_id];
     return out;
 }
 
 // Fragment shader
 
 @fragment
-fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+fn fs_main(vert_in: VertexOutput) -> @location(0) vec4<f32> {
+    var in = vert_in;
+    in.color *= in.shading;
     return in.color;
 }
