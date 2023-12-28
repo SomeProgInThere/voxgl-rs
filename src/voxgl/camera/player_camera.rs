@@ -3,6 +3,7 @@ use wgpu::util::DeviceExt;
 use crate::voxgl::camera::projection::Projection;
 use crate::voxgl::rendering::utils;
 
+pub const DEFAULT_VERTICAL_FOV: f32 = 45.0;
 pub const MAX_VERTICAL_FOV: f32 = 90.0;
 
 #[repr(C)]
@@ -43,7 +44,6 @@ impl PlayerCamera {
         yaw: cgmath::Rad<f32>,
         pitch: cgmath::Rad<f32>,
         aspect: f32,
-        v_fov: cgmath::Deg<f32>,
         z_near: f32,
         z_far: f32,
         uniform: &CameraUniform,
@@ -76,7 +76,7 @@ impl PlayerCamera {
         Self {
             position,
             yaw,
-            v_fov,
+            v_fov: cgmath::Deg(DEFAULT_VERTICAL_FOV),
             pitch,
             projection,
             buffer,

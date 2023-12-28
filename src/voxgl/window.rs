@@ -4,7 +4,7 @@ use winit::{
     window::WindowBuilder, dpi::PhysicalSize,
 };
 
-use super::{state::State, camera::player_camera::MAX_VERTICAL_FOV};
+use super::{state::State, camera::player_camera::{MAX_VERTICAL_FOV, DEFAULT_VERTICAL_FOV}};
 
 pub async fn run() {
     env_logger::init();
@@ -34,7 +34,7 @@ pub async fn run() {
                     match delta {
                         MouseScrollDelta::LineDelta(_, y) => {
                             state.camera.v_fov -= cgmath::Deg(y);
-                            state.camera.v_fov.0 = state.camera.v_fov.0.clamp(1.0, MAX_VERTICAL_FOV);
+                            state.camera.v_fov.0 = state.camera.v_fov.0.clamp(DEFAULT_VERTICAL_FOV, MAX_VERTICAL_FOV);
                         },
                         _ => {},
                     } 

@@ -84,7 +84,6 @@ impl State {
             cgmath::Deg(-90.0).into(),
             cgmath::Deg(-20.0).into(),
             config.width as f32 / config.height as f32,
-            cgmath::Deg(45.0),
             0.1,
             100.0,
             &camera_uniform,
@@ -109,7 +108,7 @@ impl State {
         chunks.build_chunk_meshes_in_queue(&device, &mut arena);
 
         let sky_color = wgpu::Color {
-            r: 0.0, g: 0.0, b: 0.0, a: 1.0
+            r: 0.2, g: 0.4, b: 0.8, a: 1.0
         };
 
         Self {
@@ -184,8 +183,10 @@ impl State {
     }
 
     pub fn update(&mut self, dt: std::time::Duration) {
-        self.camera_controller.update(&mut self.camera, dt);
-        self.camera_uniform.update_view_proj(&self.camera);
+        if self.cursor_grabbed {
+            self.camera_controller.update(&mut self.camera, dt);
+            self.camera_uniform.update_view_proj(&self.camera);
+        }
 
         self.queue.write_buffer(
             &self.camera.buffer,

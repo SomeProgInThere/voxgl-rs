@@ -8,7 +8,6 @@ pub enum Face {
 }
 
 impl Face {
-    #[allow(dead_code)]
     pub fn get_normal(&self) -> Vector3<f32> {
         match self {
             Self::Right  =>  Vector3::<f32>::unit_x(),
@@ -28,50 +27,48 @@ pub struct Quad {
     pub color: Color,
 }
 
-const HALF_SIZE: f32 = 0.5;
-
 impl Quad {
     pub fn from_face(face: Face, pos: Vector3<f32>) -> Self {
         let vertices = match face {
             Face::Right => [
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
+                Vector3::new(pos.x, pos.y + 1.0, pos.z      ),
+                Vector3::new(pos.x, pos.y + 1.0, pos.z + 1.0),
+                Vector3::new(pos.x, pos.y,       pos.z + 1.0),
+                Vector3::new(pos.x, pos.y,       pos.z      ),
             ],
             Face::Left => [
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
+                Vector3::new(pos.x, pos.y,       pos.z      ),
+                Vector3::new(pos.x, pos.y,       pos.z + 1.0),
+                Vector3::new(pos.x, pos.y + 1.0, pos.z + 1.0),
+                Vector3::new(pos.x, pos.y + 1.0, pos.z      ),
             ],
             Face::Top => [
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
+                Vector3::new(pos.x,       pos.y, pos.z + 1.0),
+                Vector3::new(pos.x + 1.0, pos.y, pos.z + 1.0),
+                Vector3::new(pos.x + 1.0, pos.y, pos.z      ),
+                Vector3::new(pos.x,       pos.y, pos.z      ),
             ],
             Face::Bottom => [
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z + HALF_SIZE),
+                Vector3::new(pos.x,       pos.y, pos.z      ),
+                Vector3::new(pos.x + 1.0, pos.y, pos.z      ),
+                Vector3::new(pos.x + 1.0, pos.y, pos.z + 1.0),
+                Vector3::new(pos.x,       pos.y, pos.z + 1.0),
             ],
             Face::Front => [
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
+                Vector3::new(pos.x + 1.0, pos.y,       pos.z),
+                Vector3::new(pos.x + 1.0, pos.y + 1.0, pos.z),
+                Vector3::new(pos.x,       pos.y + 1.0, pos.z),
+                Vector3::new(pos.x,       pos.y,       pos.z),
             ],
             Face::Back => [
-                Vector3::new(pos.x - HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x - HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y + HALF_SIZE, pos.z - HALF_SIZE),
-                Vector3::new(pos.x + HALF_SIZE, pos.y - HALF_SIZE, pos.z - HALF_SIZE),
+                Vector3::new(pos.x,       pos.y,       pos.z),
+                Vector3::new(pos.x,       pos.y + 1.0, pos.z),
+                Vector3::new(pos.x + 1.0, pos.y + 1.0, pos.z),
+                Vector3::new(pos.x + 1.0, pos.y,       pos.z),
             ],
         };
 
-        let color = Color::new(0.36, 0.84, 0.38, 1.0);
+        let color = Color::new(0.21, 0.80, 0.01, 1.0);
 
         Self {
             vertices, face, color,
