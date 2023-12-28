@@ -42,11 +42,9 @@ pub fn build_chunk_mesh(
         }
     }
     if quads.is_empty() {
-        //println!("[Mesh] Empty quads!");
+        log::warn!("trying to load empty quads at {:?}", chunk_world_pos);
     }
     
-    let mut m = 29.04;
-
     let mut vertices = Vec::<Vertex>::new();
     let mut indices = Vec::<u32>::new();
 

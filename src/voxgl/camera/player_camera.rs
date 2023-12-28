@@ -3,6 +3,8 @@ use wgpu::util::DeviceExt;
 use crate::voxgl::camera::projection::Projection;
 use crate::voxgl::rendering::utils;
 
+pub const MAX_VERTICAL_FOV: f32 = 90.0;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct CameraUniform {
@@ -18,15 +20,16 @@ impl CameraUniform {
         }
     }
 
-    pub fn update_view_proj(&mut self, camera: &Camera) {
+    pub fn update_view_proj(&mut self, camera: &PlayerCamera) {
         self.view_position = camera.position.to_homogeneous().into();
-        self.view_proj = (camera.projection.calc_matrix() * camera.calc_matrix()).into();
+        self.view_proj = (camera.projection.calc_matrix(camera.v_fov.into()) * camera.calc_matrix()).into();
     }
 }
 
-pub struct Camera {
+pub struct PlayerCamera {
     pub position: cgmath::Point3<f32>,
     pub yaw: cgmath::Rad<f32>,
+    pub v_fov: cgmath::Deg<f32>,
     pub pitch: cgmath::Rad<f32>,
     pub projection: Projection,
     pub buffer: wgpu::Buffer,
@@ -34,7 +37,7 @@ pub struct Camera {
     pub layout: wgpu::BindGroupLayout,
 }
 
-impl Camera {
+impl PlayerCamera {
     pub fn new(
         position: cgmath::Point3<f32>,
         yaw: cgmath::Rad<f32>,
@@ -47,7 +50,7 @@ impl Camera {
         device: &wgpu::Device,
     ) -> Self {
 
-        let projection = Projection::new(aspect, v_fov, z_near, z_far);
+        let projection = Projection::new(aspect, z_near, z_far);
         let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("camera_buffer"),
             contents: bytemuck::cast_slice(&[*uniform]),
@@ -71,9 +74,10 @@ impl Camera {
         });
 
         Self {
-            position: position.into(),
-            yaw: yaw.into(),
-            pitch: pitch.into(),
+            position,
+            yaw,
+            v_fov,
+            pitch,
             projection,
             buffer,
             bind_group,

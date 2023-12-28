@@ -1,4 +1,4 @@
-use super::camera::Camera;
+use super::player_camera::PlayerCamera;
 use cgmath::InnerSpace;
 use winit::event::{VirtualKeyCode, ElementState};
 
@@ -70,7 +70,7 @@ impl CameraController {
         self.rotate_vertical = mouse_dy as f32;
     }
 
-    pub fn update(&mut self, camera: &mut Camera, dt: std::time::Duration) {
+    pub fn update(&mut self, camera: &mut PlayerCamera, dt: std::time::Duration) {
         let dt = dt.as_secs_f32();
 
         let (yaw_sin, yaw_cos) = camera.yaw.0.sin_cos();

@@ -24,12 +24,10 @@ struct VertexOutput {
 fn vs_main(vert_in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
     var face_shade = array<f32, 6>(
-        1.0, 0.5, // top, bottom 
-        0.5, 0.8, // right, left
-        0.5, 0.8, // front, back
+        1.0, 0.4, // top, bottom 
+        0.4, 0.7, // right, left
+        0.4, 0.7, // front, back
     );
-
-    var ao_values = array<f32, 4>(0.1, 0.25, 0.5, 1.0);
 
     out.color = vert_in.color;
     out.clip_position = camera.view_proj * vec4<f32>(vert_in.position, 1.0);

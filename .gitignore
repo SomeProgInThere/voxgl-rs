@@ -1,5 +1,6 @@
 /target
 /.idea
+/.vs
+/.cargo
 rust-toolchain.toml
-.cargo/config.toml
 Cargo.lock

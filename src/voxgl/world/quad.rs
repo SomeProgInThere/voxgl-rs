@@ -71,7 +71,7 @@ impl Quad {
             ],
         };
 
-        let color = Color::new(0.12, 0.4, 0.2, 1.0);
+        let color = Color::new(0.36, 0.84, 0.38, 1.0);
 
         Self {
             vertices, face, color,

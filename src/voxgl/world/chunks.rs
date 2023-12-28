@@ -7,15 +7,15 @@ use crate::voxgl::world::mesh_builder::{self};
 use crate::voxgl::rendering::arena::MeshArena;
 use crate::voxgl::world::voxel::Voxel;
 
-pub const RENDER_DISTANCE: i32 = 8;
+pub const RENDER_DISTANCE: i32 = 6;
 
 pub const MAX_DATA_LOAD: usize = 10_000;
 pub const MAX_MESH_LOAD: usize = 10_000;
 
-pub const MAX_DATA_LOAD_QUEUE: usize = 12;
-pub const MAX_MESH_LOAD_QUEUE: usize = 8;
-pub const MAX_DATA_UNLOAD_QUEUE: usize = 12;
-pub const MAX_MESH_UNLOAD_QUEUE: usize = 8;
+pub const MAX_DATA_LOAD_QUEUE: usize = 16;
+pub const MAX_MESH_LOAD_QUEUE: usize = 6;
+pub const MAX_DATA_UNLOAD_QUEUE: usize = 16;
+pub const MAX_MESH_UNLOAD_QUEUE: usize = 6;
 
 pub struct Chunks {
     chunk_data_map: HashMap<cgmath::Vector3<i32>, ChunkData>,
@@ -32,9 +32,6 @@ pub struct Chunks {
     render_distance: i32,
     pub position: cgmath::Vector3<f32>,
 }
-
-unsafe impl std::marker::Send for Chunks {}
-unsafe impl std::marker::Sync for Chunks {}
 
 impl Chunks {
     pub fn new() -> Self {
@@ -78,9 +75,9 @@ impl Chunks {
     pub fn build_chunk_data(&mut self, chunk_pos: Vector3<i32>) {
         let mut chunk = self.chunk_data_pool.detached();
         let chunk_world_pos = chunk_to_world(&chunk_pos);
-
         chunk.build_voxel_data(&chunk_world_pos);
-        //println!("loaded chunk data at world pos: {:?}", chunk_world_pos);
+
+        #[cfg(debug_assertions)] log::info!("loaded chunk data at world pos: {:?}", chunk_world_pos);
         self.chunk_data_map.insert(chunk_pos, chunk);
     }
 
@@ -93,7 +90,8 @@ impl Chunks {
             let chunk_mesh = self.chunk_mesh_pool.detached();
             self.chunk_mesh_map.insert(chunk_pos, chunk_mesh);
 
-            //println!("building chunk mesh at: {:?}", chunk_pos);
+            #[cfg(debug_assertions)] log::info!("building chunk mesh at: {:?}", chunk_pos);
+            
             let chunk_world_pos = chunk_to_world(&chunk_pos);
             if mesh_builder::build_chunk_mesh(self, &chunk_pos, &chunk_world_pos, device, arena) {
                 return;
@@ -189,7 +187,8 @@ impl Chunks {
                 continue;
             }
 
-            //println!("queueing chunk for data unload: {:?}", chunk_pos);
+            #[cfg(debug_assertions)] log::info!("queueing chunk for data unload: {:?}", chunk_pos);
+            
             self.chunk_data_unload_queue.push_back(*chunk_pos);
             if self.chunk_data_unload_queue.len() >= MAX_DATA_UNLOAD_QUEUE {
                 return;
@@ -221,7 +220,8 @@ impl Chunks {
                 continue;
             }
 
-            //println!("queueing chunk for mesh unload: {:?}", chunk_pos);
+            #[cfg(debug_assertions)] log::info!("queueing chunk for mesh unload: {:?}", chunk_pos);
+            
             self.chunk_mesh_unload_queue.push_back(*chunk_pos);
             if self.chunk_mesh_unload_queue.len() >= MAX_MESH_UNLOAD_QUEUE {
                 return;
@@ -232,7 +232,8 @@ impl Chunks {
     pub fn unload_data_queue(&mut self) {
         while let Some(chunk_pos) = self.chunk_data_unload_queue.pop_front() {
             if let Some(chunk_data) = self.chunk_data_map.remove(&chunk_pos) {
-                //println!("unloading data at: {:?}", chunk_pos);
+                
+                #[cfg(debug_assertions)] log::info!("unloading data at: {:?}", chunk_pos);
                 self.chunk_data_pool.attach(chunk_data);
             }
         }
@@ -263,7 +264,7 @@ impl Chunks {
                     }
 
                     if self.chunk_data_load_queue.len() >= MAX_DATA_LOAD_QUEUE {
-                        //println!("done");
+                        #[cfg(debug_assertions)] log::info!("updated chunk at: {:?}", chunk_pos);
                         return;
                     }
                 }
@@ -274,7 +275,8 @@ impl Chunks {
     pub fn unload_mesh_queue(&mut self, arena: &mut MeshArena) {
         while let Some(chunk_pos) = self.chunk_mesh_unload_queue.pop_front() {
             if let Some(chunk_mesh) = self.chunk_mesh_map.remove(&chunk_pos) {
-                //println!("unloading mesh at: {:?}", chunk_pos);
+
+                #[cfg(debug_assertions)] log::info!("unloading mesh at: {:?}", chunk_pos);
 
                 if let Some(v_buf_key) = chunk_mesh.vertex_buffer {
                     if let Some(v_buf) = arena.buffer.get_mut(v_buf_key) {

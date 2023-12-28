@@ -24,7 +24,7 @@ fn get_height(noise: &mut FastNoise, x: f32, y: f32) -> f32 {
     noise.set_fractal_octaves(5);
     noise.set_frequency(0.02);
     
-    clamped_normalize(noise.get_noise(x, y), 100f32)
+    clamped_normalize(noise.get_noise(x, y), 40f32)
 }
 
 fn clamped_normalize(value: f32, factor: f32) -> f32 {

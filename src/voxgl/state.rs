@@ -8,7 +8,7 @@ use winit::{
 
 use crate::voxgl::{ 
     camera::{
-        camera::{Camera, CameraUniform},
+        player_camera::{PlayerCamera, CameraUniform},
         camera_controller::CameraController,
     },
     texture::Texture, 
@@ -28,7 +28,7 @@ pub struct State {
     pub arena: MeshArena,
 
     pub camera_uniform: CameraUniform,
-    pub camera: Camera,
+    pub camera: PlayerCamera,
     pub camera_controller: CameraController,
 
     pub chunks: Chunks,
@@ -42,7 +42,7 @@ impl State {
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
-                backends: wgpu::Backends::VULKAN,
+                backends: wgpu::Backends::GL,
                 ..Default::default()
             }
         );
@@ -56,7 +56,7 @@ impl State {
         ).await.unwrap();
 
         let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor {
-                features: wgpu::Features::POLYGON_MODE_LINE,
+                features: wgpu::Features::empty(),
                 limits: wgpu::Limits::default(),
                 label: None
             },
@@ -69,7 +69,7 @@ impl State {
             format: swapchain_format,
             width: size.width,
             height: size.height,
-            present_mode: PresentMode::Immediate,
+            present_mode: PresentMode::Mailbox,
             alpha_mode: CompositeAlphaMode::Auto,
             view_formats: vec![],
         };
@@ -79,7 +79,7 @@ impl State {
         let depth_texture = Texture::create_depth_texture(&device, &config, "depth_texture");
 
         let mut camera_uniform = CameraUniform::new();
-        let camera = Camera::new(
+        let camera = PlayerCamera::new(
             cgmath::Point3::new(0.0, 20.0, 0.0),
             cgmath::Deg(-90.0).into(),
             cgmath::Deg(-20.0).into(),
@@ -109,7 +109,7 @@ impl State {
         chunks.build_chunk_meshes_in_queue(&device, &mut arena);
 
         let sky_color = wgpu::Color {
-            r: 0.14, g: 0.67, b: 0.95, a: 1.0
+            r: 0.0, g: 0.0, b: 0.0, a: 1.0
         };
 
         Self {
@@ -195,7 +195,7 @@ impl State {
 
         self.chunks.position = (self.camera.position.x, self.camera.position.y, self.camera.position.z).into();
 
-        if rand::thread_rng().gen_range(0..5) == 0 {
+        if rand::thread_rng().gen_range(0..3) == 0 {
             self.chunks.update_load_data_queue();
             self.chunks.update_load_mesh_queue();
 
