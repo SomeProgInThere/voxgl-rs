@@ -1,8 +1,6 @@
 use cgmath::Vector3;
 
-use super::color::Color;
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Face {
     Right, Left, Top, Bottom, Front, Back
 }
@@ -24,7 +22,7 @@ impl Face {
 pub struct Quad {
     pub vertices: [Vector3<f32>; 4],
     pub face: Face,
-    pub color: Color,
+    pub color: wgpu::Color,
 }
 
 impl Quad {
@@ -68,10 +66,8 @@ impl Quad {
             ],
         };
 
-        let color = Color::new(0.21, 0.80, 0.01, 1.0);
-
         Self {
-            vertices, face, color,
+            vertices, face, color: wgpu::Color::WHITE,
         }
     }
 }

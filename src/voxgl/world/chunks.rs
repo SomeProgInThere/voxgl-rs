@@ -76,8 +76,6 @@ impl Chunks {
         let mut chunk = self.chunk_data_pool.detached();
         let chunk_world_pos = chunk_to_world(&chunk_pos);
         chunk.build_voxel_data(&chunk_world_pos);
-
-        #[cfg(debug_assertions)] log::info!("loaded chunk data at world pos: {:?}", chunk_world_pos);
         self.chunk_data_map.insert(chunk_pos, chunk);
     }
 
@@ -89,10 +87,8 @@ impl Chunks {
             
             let chunk_mesh = self.chunk_mesh_pool.detached();
             self.chunk_mesh_map.insert(chunk_pos, chunk_mesh);
-
-            #[cfg(debug_assertions)] log::info!("building chunk mesh at: {:?}", chunk_pos);
-            
             let chunk_world_pos = chunk_to_world(&chunk_pos);
+            
             if mesh_builder::build_chunk_mesh(self, &chunk_pos, &chunk_world_pos, device, arena) {
                 return;
             }
@@ -186,8 +182,6 @@ impl Chunks {
             if self.chunk_data_unload_queue.contains(chunk_pos) {
                 continue;
             }
-
-            #[cfg(debug_assertions)] log::info!("queueing chunk for data unload: {:?}", chunk_pos);
             
             self.chunk_data_unload_queue.push_back(*chunk_pos);
             if self.chunk_data_unload_queue.len() >= MAX_DATA_UNLOAD_QUEUE {
@@ -219,8 +213,6 @@ impl Chunks {
             if self.chunk_mesh_unload_queue.contains(chunk_pos) {
                 continue;
             }
-
-            #[cfg(debug_assertions)] log::info!("queueing chunk for mesh unload: {:?}", chunk_pos);
             
             self.chunk_mesh_unload_queue.push_back(*chunk_pos);
             if self.chunk_mesh_unload_queue.len() >= MAX_MESH_UNLOAD_QUEUE {
@@ -232,8 +224,6 @@ impl Chunks {
     pub fn unload_data_queue(&mut self) {
         while let Some(chunk_pos) = self.chunk_data_unload_queue.pop_front() {
             if let Some(chunk_data) = self.chunk_data_map.remove(&chunk_pos) {
-                
-                #[cfg(debug_assertions)] log::info!("unloading data at: {:?}", chunk_pos);
                 self.chunk_data_pool.attach(chunk_data);
             }
         }
@@ -264,7 +254,6 @@ impl Chunks {
                     }
 
                     if self.chunk_data_load_queue.len() >= MAX_DATA_LOAD_QUEUE {
-                        #[cfg(debug_assertions)] log::info!("updated chunk at: {:?}", chunk_pos);
                         return;
                     }
                 }
@@ -275,8 +264,6 @@ impl Chunks {
     pub fn unload_mesh_queue(&mut self, arena: &mut MeshArena) {
         while let Some(chunk_pos) = self.chunk_mesh_unload_queue.pop_front() {
             if let Some(chunk_mesh) = self.chunk_mesh_map.remove(&chunk_pos) {
-
-                #[cfg(debug_assertions)] log::info!("unloading mesh at: {:?}", chunk_pos);
 
                 if let Some(v_buf_key) = chunk_mesh.vertex_buffer {
                     if let Some(v_buf) = arena.buffer.get_mut(v_buf_key) {

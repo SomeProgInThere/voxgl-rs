@@ -41,6 +41,7 @@ pub fn build_chunk_mesh(
             }
         }
     }
+
     if quads.is_empty() {
         log::warn!("trying to load empty quads at {:?}", chunk_world_pos);
     }
@@ -69,29 +70,39 @@ fn process_voxel(
         true => {
             // voxel is solid
             if !left.is_solid() {
-                quads.push(Quad::from_face(Face::Left, voxel_world_pos));
+                push_quad(*voxel, Face::Left, voxel_world_pos, quads);
             }
             if !bottom.is_solid() {
-                quads.push(Quad::from_face(Face::Bottom, voxel_world_pos));
+                push_quad(*voxel, Face::Bottom, voxel_world_pos, quads);
             }
             if !back.is_solid() {
-                quads.push(Quad::from_face(Face::Back, voxel_world_pos));
+                push_quad(*voxel, Face::Back, voxel_world_pos, quads);
             }
         }
 
         false => {
-            // voxel is not solid
+            // voxel is empty
             if left.is_solid() {
-                quads.push(Quad::from_face(Face::Right, voxel_world_pos));
+                push_quad(*left, Face::Right, voxel_world_pos, quads);
             }
             if bottom.is_solid() {
-                quads.push(Quad::from_face(Face::Top, voxel_world_pos));
+                push_quad(*bottom, Face::Top, voxel_world_pos, quads);
             }
             if back.is_solid() {
-                quads.push(Quad::from_face(Face::Front, voxel_world_pos));
+                push_quad(*back, Face::Front, voxel_world_pos, quads);
             }
         }
     }
+}
+
+fn push_quad(voxel: Voxel, face: Face, pos: Vector3<f32>, quads: &mut Vec<Quad>) {
+    let mut quad = Quad::from_face(face, pos);
+    quad.color = voxel.voxel_id.get_color();
+    quads.push(quad);
+}
+
+fn color_as_array(color: &wgpu::Color) -> [f32; 4] {
+    [color.r as f32, color.g as f32, color.b as f32, color.a as f32]
 }
 
 fn process_quads(quads: &Vec<Quad>, vertices: &mut Vec<Vertex>, indices: &mut Vec<u32>) {
@@ -101,7 +112,7 @@ fn process_quads(quads: &Vec<Quad>, vertices: &mut Vec<Vertex>, indices: &mut Ve
             vertices.push(Vertex {
                 position: quad.vertices[index].into(),
                 normal: quad.face.get_normal().into(),
-                color: quad.color.into(),
+                color: color_as_array(&quad.color),
             });
         });
 

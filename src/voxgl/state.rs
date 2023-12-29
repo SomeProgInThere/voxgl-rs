@@ -63,7 +63,7 @@ impl State {
             None
         ).await.unwrap();
 
-        let swapchain_format = wgpu::TextureFormat::Bgra8UnormSrgb;
+        let swapchain_format = wgpu::TextureFormat::Rgba16Float;
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: swapchain_format,

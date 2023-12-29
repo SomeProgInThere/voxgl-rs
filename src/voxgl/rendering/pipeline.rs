@@ -15,7 +15,7 @@ pub fn create_voxel_pipeline(device: &wgpu::Device, layouts: &[&wgpu::BindGroupL
     let render_pipeline = utils::create_render_pipeline(
         &device,
         &pipeline_layout,
-        wgpu::TextureFormat::Bgra8UnormSrgb,
+        wgpu::TextureFormat::Rgba16Float,
         texture::Texture::DEPTH_FORMAT,
         &[Vertex::desc()],
         shader_module,

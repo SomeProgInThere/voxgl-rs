@@ -2,6 +2,8 @@ use cgmath::Vector3;
 use crate::voxgl::world::voxel::Voxel;
 use generational_arena::Index;
 
+use super::voxel::VoxelId;
+
 pub const SIZE: usize = 16;
 
 lazy_static::lazy_static! {
@@ -19,7 +21,7 @@ impl lifeguard::Recycleable for ChunkData {
 
     fn reset(&mut self) {
         for voxel in self.voxels.iter_mut() {
-            voxel.set_density_frac(0f32);
+            voxel.set_new_id(VoxelId::Empty);
         }
     }
 }
@@ -27,7 +29,7 @@ impl lifeguard::Recycleable for ChunkData {
 impl ChunkData {
     pub fn new() -> Self {
         Self {
-            voxels: [Voxel::new(0); SIZE * SIZE * SIZE],
+            voxels: [Voxel::new(); SIZE * SIZE * SIZE],
         }
     }
 
