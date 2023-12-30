@@ -11,7 +11,7 @@
 - Spectator-like player camera
 - Basic terrain for now
 
-Mostly inspired by [**TanTanDev's voxel engine project**](https://github.com/TanTanDev/first_voxel_engine) and using their **hashmap-based** world generation.
+Mostly inspired by [**TanTanDev's voxel engine project**](https://github.com/TanTanDev/first_voxel_engine) and using their implementation of **chunk-based** world generation.
 
 ## Controls
 
