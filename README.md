@@ -1,6 +1,6 @@
 # voxgl-rs
 
-## A voxel-based game engine
+### A voxel-based game engine
 
 ![world-gen screenshot](github/screenshot.PNG)
 
