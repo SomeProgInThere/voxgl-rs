@@ -1,3 +1,4 @@
+use wgpu_text::glyph_brush::{Section, Text, Layout, HorizontalAlign, VerticalAlign};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -18,6 +19,7 @@ pub async fn run() {
         .unwrap();
 
     let mut state = State::new(window).await;
+    let mut frame_count = 0;
     let mut last_render_time = std::time::Instant::now(); 
 
     event_loop.run(move |event, _, control_flow| 
@@ -83,13 +85,35 @@ pub async fn run() {
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                     Err(e) => eprintln!("{:?}", e),
                 }
+                
+                let pos = format!("X: {0:.2}, Y: {1:.2}, Z: {2:.2}", 
+                    state.camera.position.x,
+                    state.camera.position.y,
+                    state.camera.position.z
+                );
+                
+                let section = Section::default()
+                    .add_text(Text::new(pos.as_str())
+                    .with_scale(25.0)
+                    .with_color([0.94, 0.94, 0.94, 1.0]))
+                    .with_layout(Layout::default().h_align(HorizontalAlign::Left).v_align(VerticalAlign::Top));
+
+                match state.brush.queue(&state.device, &state.queue, vec![&section]) {
+                    Ok(_) => (),
+                    Err(err) => println!("{err}"),
+                }
 
                 let now = std::time::Instant::now();
                 let curr_fps = 1.0 / (now - then).as_secs_f32();
-                
-                state.window.set_title(
-                    &format!("Voxgl [fps: {:.1} | tri_count: {}]", curr_fps, state.chunks.get_vertex_count() / 3)
-                );
+
+                // update fps every 50 frames
+                if frame_count >= 50 {
+                    state.window.set_title(
+                        &format!("Voxgl [fps: {:.1} | tri_count: {}]", curr_fps, state.chunks.get_vertex_count() / 3)
+                    );
+                    frame_count = 0;
+                }
+                frame_count += 1;
             }
 
             Event::MainEventsCleared => {

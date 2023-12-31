@@ -104,8 +104,8 @@ impl Chunks {
     }
 
     pub fn in_range(&self, chunk_pos: Vector3<i32>) -> bool {
-        let chunk_real_pos = chunk_to_world(&chunk_pos);
-        let delta = self.position - chunk_real_pos;
+        let chunk_world_pos = chunk_to_world(&chunk_pos);
+        let delta = self.position - chunk_world_pos;
 
         let distance_sq: f32 = delta.magnitude2().into();
         let render_dist = (self.render_distance as f32) * SIZE as f32;

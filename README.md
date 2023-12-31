@@ -8,7 +8,7 @@
 
 - [Wgpu](https://wgpu.rs/) as graphics library (**OpenGL backend**)
 - Infinite world generation
-- Spectator-like player camera
+- Spectator-like camera
 - Basic terrain for now
 
 Mostly inspired by [**TanTanDev's voxel engine project**](https://github.com/TanTanDev/first_voxel_engine) and using their implementation of **chunk-based** world generation.
@@ -17,4 +17,5 @@ Mostly inspired by [**TanTanDev's voxel engine project**](https://github.com/Tan
 
 - **WASD** for normal movement
 - **Space/LShift** for vertical movement
+- **Scroll** to zoom
 - **Esc** to toggle the cursor

@@ -9,10 +9,10 @@ edition = "2021"
 anyhow = "1.0.72"
 bracket-noise = "0.8.7"
 bytemuck = { version = "1.13.1", features = ["derive"] }
+image = { version = "0.24.7", default-features = false, features = ["png"] }
 cgmath = "0.18.0"
 env_logger = "0.10.0"
 generational-arena = "0.2.9"
-image = "0.24.7"
 instant = "0.1.12"
 lazy_static = "1.4.0"
 lifeguard = "0.6.1"
@@ -21,6 +21,7 @@ pollster = "0.3.0"
 rand = "0.8.5"
 wgpu = "0.18.0"
 winit = "0.28.7"
+wgpu_text = "0.8.5"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]

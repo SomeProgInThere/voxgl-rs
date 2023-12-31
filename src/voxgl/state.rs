@@ -1,8 +1,9 @@
 use std::default::Default;
 use rand::Rng;
 use wgpu::{CompositeAlphaMode, PresentMode};
+use wgpu_text::{glyph_brush::ab_glyph::FontRef, BrushBuilder};
 use winit::{
-    window::{Window, CursorGrabMode}, 
+    window::{Window, CursorGrabMode, CursorIcon}, 
     event::{WindowEvent, KeyboardInput, MouseButton, ElementState, VirtualKeyCode}
 };
 
@@ -13,10 +14,12 @@ use crate::voxgl::{
     },
     texture::Texture, 
     world::chunks::Chunks,
-    rendering::{arena::MeshArena, pipeline},
+    rendering::arena::MeshArena,
 };
 
-pub struct State {
+use super::rendering::pipeline;
+
+pub struct State<'a> {
     pub surface: wgpu::Surface,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -33,12 +36,13 @@ pub struct State {
 
     pub chunks: Chunks,
     pub sky_color: wgpu::Color,
+    pub brush: wgpu_text::TextBrush<FontRef<'a>>,
 
     pub mouse_pressed: bool,
     pub cursor_grabbed: bool,
 }
 
-impl State {
+impl<'a> State<'a> {
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
@@ -75,8 +79,10 @@ impl State {
         };
 
         surface.configure(&device, &config);
-
         let depth_texture = Texture::create_depth_texture(&device, &config, "depth_texture");
+
+        let brush = BrushBuilder::using_font_bytes(include_bytes!("resources/consolas.TTF")).unwrap()
+                .build(&device, config.width, config.height, config.format);
 
         let mut camera_uniform = CameraUniform::new();
         let camera = PlayerCamera::new(
@@ -126,6 +132,7 @@ impl State {
 		
             sky_color,
             chunks,
+            brush,
             arena,
 
             mouse_pressed: false,
@@ -144,6 +151,7 @@ impl State {
             self.config.height = new_size.height;
 
             self.depth_texture = Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
+            self.brush.resize_view(self.config.width as f32, self.config.height as f32, &self.queue);
 
             self.camera.projection.resize(new_size.width, new_size.height);
             self.surface.configure(&self.device, &self.config);
@@ -196,13 +204,10 @@ impl State {
 
         self.chunks.position = (self.camera.position.x, self.camera.position.y, self.camera.position.z).into();
 
-        if rand::thread_rng().gen_range(0..3) == 0 {
-            self.chunks.update_load_data_queue();
-            self.chunks.update_load_mesh_queue();
-
-            self.chunks.update_unload_mesh_queue();
-            self.chunks.update_unload_data_queue();
-        }
+        self.chunks.update_load_data_queue();
+        self.chunks.update_load_mesh_queue();
+        self.chunks.update_unload_mesh_queue();
+        self.chunks.update_unload_data_queue();
 
         self.chunks.build_chunk_data_in_queue();
         self.chunks.build_chunk_meshes_in_queue(&self.device, &mut self.arena);
@@ -217,7 +222,7 @@ impl State {
             self.window.set_cursor_grab(CursorGrabMode::Confined).unwrap();
             self.window.set_cursor_visible(false);
         } else {
-            self.window.set_cursor_grab(CursorGrabMode::None).unwrap();
+            self.window.set_cursor_grab(CursorGrabMode::None).unwrap();            
             self.window.set_cursor_visible(true);
         }
     }

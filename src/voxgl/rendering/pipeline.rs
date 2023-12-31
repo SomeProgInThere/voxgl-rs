@@ -1,4 +1,3 @@
-use crate::voxgl::texture;
 use crate::voxgl::rendering::{utils, vertex::Vertex};
 
 pub fn create_voxel_pipeline(device: &wgpu::Device, layouts: &[&wgpu::BindGroupLayout]) -> wgpu::RenderPipeline {
@@ -16,7 +15,7 @@ pub fn create_voxel_pipeline(device: &wgpu::Device, layouts: &[&wgpu::BindGroupL
         &device,
         &pipeline_layout,
         wgpu::TextureFormat::Rgba16Float,
-        texture::Texture::DEPTH_FORMAT,
+        wgpu::TextureFormat::Depth32Float,
         &[Vertex::desc()],
         shader_module,
         "voxel_pipeline",
