@@ -34,11 +34,11 @@ impl ChunkData {
     }
 
     pub fn get_voxel(&self, pos: &Vector3<i32>) -> Option<&Voxel> {
-        self.voxels.get(Self::get_index(pos))
+        self.voxels.get(Self::get_index(pos.x, pos.y, pos.z))
     }
 
-    pub fn get_index(pos: &Vector3<i32>) -> usize {
-        (pos.z | (pos.y << *BIT_SIZE) | (pos.x << (*BIT_SIZE * 2))) as usize
+    pub fn get_index(x: i32, y: i32, z: i32) -> usize {
+        (z | (y << *BIT_SIZE) | (x << (*BIT_SIZE * 2))) as usize
     }
 
     pub fn get_local_pos(index: i32) -> Vector3<i32> {

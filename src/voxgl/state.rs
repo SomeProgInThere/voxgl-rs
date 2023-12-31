@@ -1,9 +1,8 @@
 use std::default::Default;
-use rand::Rng;
 use wgpu::{CompositeAlphaMode, PresentMode};
 use wgpu_text::{glyph_brush::ab_glyph::FontRef, BrushBuilder};
 use winit::{
-    window::{Window, CursorGrabMode, CursorIcon}, 
+    window::{Window, CursorGrabMode}, 
     event::{WindowEvent, KeyboardInput, MouseButton, ElementState, VirtualKeyCode}
 };
 
