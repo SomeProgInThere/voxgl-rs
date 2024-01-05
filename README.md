@@ -11,7 +11,9 @@
 - Spectator-like camera
 - Basic terrain for now
 
-Mostly inspired by [**TanTanDev's voxel engine project**](https://github.com/TanTanDev/first_voxel_engine) and using their implementation of **chunk-based** world generation.
+Mostly inspired by [*TanTanDev's voxel engine*](https://github.com/TanTanDev/first_voxel_engine) and using their implementation of **chunk-based** world generation.
+
+Features like terrain generation and lighting are taken inspiration from [*Coder Space's Minecraft Clone in Python*](https://github.com/StanislavPetrovV/Minecraft)
 
 ## Controls
 

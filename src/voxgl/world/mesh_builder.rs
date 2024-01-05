@@ -1,23 +1,22 @@
+use anyhow::Context;
 use cgmath::Vector3;
 use wgpu::util::DeviceExt;
 
 use crate::voxgl::{
     rendering::{arena::MeshArena, vertex::Vertex},
     world::{
-        chunk::SIZE,
+        chunk::CHUNK_SIZE,
         chunks::Chunks,
         quad::{Face, Quad},
         voxel::Voxel,
     }
 };
 
-use super::chunks::adjacent_voxels;
-
 pub fn build_chunk_mesh(
     chunks: &mut Chunks, chunk_pos: &Vector3<i32>, chunk_world_pos: &Vector3<f32>, device: &wgpu::Device, arena: &mut MeshArena
 ) -> bool {
 
-    let chunk_size = SIZE as i32;
+    let chunk_size = CHUNK_SIZE as i32;
     let mut quads = Vec::<Quad>::new();
 
     for x in 0..chunk_size {
@@ -63,6 +62,20 @@ pub fn build_chunk_mesh(
     false
 }
 
+fn adjacent_voxels<'a>(
+    chunks: &'a Chunks, local_pos: Vector3<i32>, chunk_pos: &Vector3<i32>
+) -> anyhow::Result<(&'a Voxel, &'a Voxel, &'a Voxel, &'a Voxel)> {
+
+    let (x, y, z) = (local_pos.x, local_pos.y, local_pos.z);
+
+    let voxel = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y, z)).context("no voxel")?;
+    let back = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y, z - 1)).context("no back")?;
+    let left = chunks.try_get_voxel(chunk_pos, &Vector3::new(x - 1, y, z)).context("no left")?;
+    let bottom = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y - 1, z)).context("no bottom")?;
+
+    Ok((voxel, back, left, bottom))
+}
+
 fn process_voxel(
     voxel: &Voxel, voxel_world_pos: Vector3<f32>, left: &Voxel, bottom: &Voxel, back: &Voxel, quads: &mut Vec<Quad>
 ) {
@@ -97,7 +110,7 @@ fn process_voxel(
 
 fn push_quad(voxel: Voxel, face: Face, pos: Vector3<f32>, quads: &mut Vec<Quad>) {
     let mut quad = Quad::from_face(face, pos);
-    quad.color = voxel.voxel_id.get_color();
+    quad.color = voxel.id.get_color();
     quads.push(quad);
 }
 

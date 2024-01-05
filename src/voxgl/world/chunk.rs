@@ -4,14 +4,14 @@ use generational_arena::Index;
 
 use super::voxel::VoxelId;
 
-pub const SIZE: usize = 16;
+pub const CHUNK_SIZE: usize = 16;
 
 lazy_static::lazy_static! {
-    pub static ref BIT_SIZE: i32 = (SIZE as f32).log2() as i32;
+    pub static ref BIT_SIZE: i32 = (CHUNK_SIZE as f32).log2() as i32;
 }
 
 pub struct ChunkData {
-    pub voxels: [Voxel; SIZE * SIZE * SIZE],
+    pub voxels: [Voxel; CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE],
 }
 
 impl lifeguard::Recycleable for ChunkData {
@@ -21,7 +21,7 @@ impl lifeguard::Recycleable for ChunkData {
 
     fn reset(&mut self) {
         for voxel in self.voxels.iter_mut() {
-            voxel.set_new_id(VoxelId::Empty);
+            voxel.id = VoxelId::Empty;
         }
     }
 }
@@ -29,7 +29,7 @@ impl lifeguard::Recycleable for ChunkData {
 impl ChunkData {
     pub fn new() -> Self {
         Self {
-            voxels: [Voxel::new(); SIZE * SIZE * SIZE],
+            voxels: [Voxel::new(); CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE],
         }
     }
 
@@ -43,9 +43,9 @@ impl ChunkData {
 
     pub fn get_local_pos(index: i32) -> Vector3<i32> {
         Vector3 {
-            x: (index as f32 / (SIZE * SIZE) as f32) as i32,
-            y: ((index as f32 / SIZE as f32) % SIZE as f32) as i32,
-            z: (index as f32 % SIZE as f32) as i32,
+            x: (index as f32 / (CHUNK_SIZE * CHUNK_SIZE) as f32) as i32,
+            y: ((index as f32 / CHUNK_SIZE as f32) % CHUNK_SIZE as f32) as i32,
+            z: (index as f32 % CHUNK_SIZE as f32) as i32,
         }
     }
 }

@@ -2,7 +2,7 @@ use std::collections::{HashMap, VecDeque};
 use anyhow::{*, Context};
 use cgmath::{InnerSpace, Vector3};
 use lifeguard::{StartingSize, Pool, pool};
-use crate::voxgl::world::chunk::{ChunkData, ChunkMesh, SIZE};
+use crate::voxgl::world::chunk::{ChunkData, ChunkMesh, CHUNK_SIZE};
 use crate::voxgl::world::mesh_builder::{self};
 use crate::voxgl::rendering::arena::MeshArena;
 use crate::voxgl::world::voxel::Voxel;
@@ -108,7 +108,7 @@ impl Chunks {
         let delta = self.position - chunk_world_pos;
 
         let distance_sq: f32 = delta.magnitude2().into();
-        let render_dist = (self.render_distance as f32) * SIZE as f32;
+        let render_dist = (self.render_distance as f32) * CHUNK_SIZE as f32;
         let render_distance_sq = render_dist * render_dist;
 
         distance_sq < render_distance_sq
@@ -123,9 +123,9 @@ impl Chunks {
             for z in -self.render_distance..self.render_distance {
                 for x in -self.render_distance..self.render_distance {
                     let current_chunk_pos = Vector3::<i32>::new(
-                        (self.position.x / SIZE as f32) as i32,
-                        (self.position.y / SIZE as f32) as i32,
-                        (self.position.z / SIZE as f32) as i32,
+                        (self.position.x / CHUNK_SIZE as f32) as i32,
+                        (self.position.y / CHUNK_SIZE as f32) as i32,
+                        (self.position.z / CHUNK_SIZE as f32) as i32,
                     );
                     let chunk_pos = current_chunk_pos + Vector3::<i32>::new(x, y, z);
 
@@ -161,9 +161,9 @@ impl Chunks {
 
     pub fn update_unload_data_queue(&mut self) {
         let current_chunk_pos = Vector3::<i32>::new(
-            (self.position.x / SIZE as f32) as i32,
-            (self.position.y / SIZE as f32) as i32,
-            (self.position.z / SIZE as f32) as i32,
+            (self.position.x / CHUNK_SIZE as f32) as i32,
+            (self.position.y / CHUNK_SIZE as f32) as i32,
+            (self.position.z / CHUNK_SIZE as f32) as i32,
         );
 
         let outside = self.chunk_mesh_map.iter()
@@ -192,9 +192,9 @@ impl Chunks {
 
     pub fn update_unload_mesh_queue(&mut self) {
         let current_chunk_pos = Vector3::<i32>::new(
-            (self.position.x / SIZE as f32) as i32,
-            (self.position.y / SIZE as f32) as i32,
-            (self.position.z / SIZE as f32) as i32,
+            (self.position.x / CHUNK_SIZE as f32) as i32,
+            (self.position.y / CHUNK_SIZE as f32) as i32,
+            (self.position.z / CHUNK_SIZE as f32) as i32,
         );
 
         let outside = self.chunk_mesh_map.iter()
@@ -238,9 +238,9 @@ impl Chunks {
             for z in -self.render_distance..self.render_distance {
                 for x in -self.render_distance..self.render_distance {
                     let current_chunk_pos = Vector3::<i32>::new(
-                        (self.position.x / SIZE as f32) as i32,
-                        (self.position.y / SIZE as f32) as i32,
-                        (self.position.z / SIZE as f32) as i32,
+                        (self.position.x / CHUNK_SIZE as f32) as i32,
+                        (self.position.y / CHUNK_SIZE as f32) as i32,
+                        (self.position.z / CHUNK_SIZE as f32) as i32,
                     );
 
                     let chunk_pos = current_chunk_pos + Vector3::<i32>::new(x, y, z);
@@ -312,25 +312,8 @@ impl Chunks {
     }
 }
 
-pub fn adjacent_voxels<'a>(
-    chunks: &'a Chunks, local_pos: Vector3<i32>, chunk_pos: &Vector3<i32>
-) -> anyhow::Result<(&'a Voxel, &'a Voxel, &'a Voxel, &'a Voxel)> {
-
-    let (x, y, z) = (local_pos.x, local_pos.y, local_pos.z);
-    let voxel = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y, z))
-        .context("no voxel")?;
-    let back = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y, z - 1))
-        .context("no back")?;
-    let left = chunks.try_get_voxel(chunk_pos, &Vector3::new(x - 1, y, z))
-        .context("no left")?;
-    let bottom = chunks.try_get_voxel(chunk_pos, &Vector3::new(x, y - 1, z))
-        .context("no bottom")?;
-
-    Ok((voxel, back, left, bottom))
-}
-
 fn make_coords_valid(chunk_pos: &mut Vector3<i32>, local_pos: &mut Vector3<i32>) {
-    let chunk_size = SIZE as i32;
+    let chunk_size = CHUNK_SIZE as i32;
     while local_pos.x < 0 {
         local_pos.x += chunk_size;
         chunk_pos.x -= 1;
@@ -359,9 +342,9 @@ fn make_coords_valid(chunk_pos: &mut Vector3<i32>, local_pos: &mut Vector3<i32>)
 
 fn chunk_to_world(chunk_pos: &Vector3<i32>) -> Vector3<f32> {
     Vector3::<f32>::new(
-        chunk_pos.x as f32 * SIZE as f32,
-        chunk_pos.y as f32 * SIZE as f32,
-        chunk_pos.z as f32 * SIZE as f32,
+        chunk_pos.x as f32 * CHUNK_SIZE as f32,
+        chunk_pos.y as f32 * CHUNK_SIZE as f32,
+        chunk_pos.z as f32 * CHUNK_SIZE as f32,
     )
 }
 

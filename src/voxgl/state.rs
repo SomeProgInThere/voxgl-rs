@@ -18,6 +18,8 @@ use crate::voxgl::{
 
 use super::rendering::pipeline;
 
+const CHUNK_UPDATE_RATE: i32 = 2;
+
 pub struct State<'a> {
     pub surface: wgpu::Surface,
     pub device: wgpu::Device,
@@ -39,6 +41,8 @@ pub struct State<'a> {
 
     pub mouse_pressed: bool,
     pub cursor_grabbed: bool,
+
+    framecount: i32,
 }
 
 impl<'a> State<'a> {
@@ -136,6 +140,8 @@ impl<'a> State<'a> {
 
             mouse_pressed: false,
             cursor_grabbed: false,
+            
+            framecount: 0
         }
     }
 
@@ -174,6 +180,11 @@ impl<'a> State<'a> {
                     if *key == VirtualKeyCode::Escape && *state == ElementState::Pressed {
                         self.grab_cursor();
                     }
+
+                    if *key == VirtualKeyCode::R && *state == ElementState::Pressed {
+                        // reload chunks
+                        self.run_chunk_loop();
+                    }
                 }
                 true
             },
@@ -190,6 +201,8 @@ impl<'a> State<'a> {
     }
 
     pub fn update(&mut self, dt: std::time::Duration) {
+        self.framecount += 1;
+
         if self.cursor_grabbed {
             self.camera_controller.update(&mut self.camera, dt);
             self.camera_uniform.update_view_proj(&self.camera);
@@ -203,6 +216,13 @@ impl<'a> State<'a> {
 
         self.chunks.position = (self.camera.position.x, self.camera.position.y, self.camera.position.z).into();
 
+        if self.framecount == CHUNK_UPDATE_RATE {
+            self.run_chunk_loop();
+            self.framecount = 0;
+        }
+    }
+
+    fn run_chunk_loop(&mut self) {
         self.chunks.update_load_data_queue();
         self.chunks.update_load_mesh_queue();
         self.chunks.update_unload_mesh_queue();
@@ -210,7 +230,6 @@ impl<'a> State<'a> {
 
         self.chunks.build_chunk_data_in_queue();
         self.chunks.build_chunk_meshes_in_queue(&self.device, &mut self.arena);
-        
         self.chunks.unload_data_queue();
         self.chunks.unload_mesh_queue(&mut self.arena);
     }
